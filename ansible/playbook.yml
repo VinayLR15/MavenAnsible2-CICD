@@ -1,12 +1,18 @@
 - name: Deploy to Tomcat
   hosts: web
   become: yes
+  vars:
+    war_file: "{{ workspace }}/target/MavenAnsibleWebApp2.war"
   tasks:
     - name: Copy WAR file to Tomcat
       copy:
-        src: "/var/snap/jenkins/4865/workspace/MavenAnsible2-CICD/target/MavenAnsibleWebApp2.war"
+        src: "{{ war_file }}"
         dest: "/opt/tomcat/webapps/MavenAnsibleWebApp2.war"
         remote_src: no
+
+    - name: Reload systemd configuration
+      command: systemctl daemon-reload
+      changed_when: false
 
     - name: Restart Tomcat
       systemd:
